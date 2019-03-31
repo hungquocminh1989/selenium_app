@@ -1,20 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium.Remote;
-using System.Drawing.Imaging;
-using selenium_grid_app.SeleniumClass;
+using OpenQA.Selenium.Chrome;
 
 namespace selenium_app.Library
 {
@@ -28,15 +16,23 @@ namespace selenium_app.Library
         public RemoteDriverConnector(string hubUrl)
         {
             rwdDriver = SettingDriver(hubUrl);
-
         }
 
         public RemoteWebDriver SettingDriver(string hubUrl)
         {
+            ChromeOptions option = new ChromeOptions();
+            option.AddArgument("--disable-infobars");
+            option.AddArguments("--start-maximized");
+            rwdDriver = new RemoteWebDriver(new Uri(hubUrl), option.ToCapabilities());
 
-            DesiredCapabilities cap = new DesiredCapabilities();
+            /*DesiredCapabilities cap = new DesiredCapabilities();
             cap.SetCapability(CapabilityType.BrowserName, DriverSetting.ChromeBrowser);
-            rwdDriver = new RemoteWebDriver(new Uri(hubUrl), cap);
+            rwdDriver = new RemoteWebDriver(new Uri(hubUrl), cap);*/
+
+            //cap.SetCapability(CapabilityType.Platform, PlatformType.Any);
+
+            //rwdDriver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromMinutes(10));
+            //rwdDriver.Manage().Timeouts().ImplicitWait.Add(TimeSpan.FromMinutes(10));
 
             return rwdDriver;
         }
@@ -49,6 +45,7 @@ namespace selenium_app.Library
         public void GoToLink(string url)
         {
             rwdDriver.Navigate().GoToUrl(url);
+            WaitingForComplete();
         }
 
         public void WaitingForComplete()

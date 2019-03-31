@@ -1,18 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium.Support.UI;
 
 namespace selenium_app.Library
 {
@@ -22,42 +11,73 @@ namespace selenium_app.Library
         API Doc : http://seleniumhq.github.io/selenium/docs/api/dotnet/index.html
          */
         private IWebDriver iwdDriver = null;
-        protected String s_Root = Environment.CurrentDirectory;
+        protected string s_Root = Environment.CurrentDirectory;
         protected Int64 i_Timeout = 999999;
-        protected String s_DriverPath = "";
+        protected string s_DriverPath = "";
         
 
-        public DriverConnector(String s_Driver_Filename = "chromedriver.exe")
+        public DriverConnector(string s_Driver_Filename = "chromedriver.exe")
         {
-            
-            ChromeOptions options = CreateChromeOption();
-            ChromeDriverService service = CreateChromeService(s_Driver_Filename);
-            iwdDriver = StartChromeDriver(service, options);
-
+            try
+            {
+                ChromeOptions options = CreateChromeOption();
+                ChromeDriverService service = CreateChromeService(s_Driver_Filename);
+                iwdDriver = StartChromeDriver(service, options);
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
         }
 
         public ChromeDriver StartChromeDriver(ChromeDriverService service, ChromeOptions options)
         {
-            ChromeDriver driver = new ChromeDriver(service, options, TimeSpan.FromSeconds(i_Timeout));
+            try
+            {
+                ChromeDriver driver = new ChromeDriver(service, options, TimeSpan.FromSeconds(i_Timeout));
+                return driver;
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
 
-            return driver;
+            return null;
         }
 
-        public ChromeDriverService CreateChromeService(String s_Driver_Filename)
+        public ChromeDriverService CreateChromeService(string s_Driver_Filename)
         {
-            ChromeDriverService service = ChromeDriverService.CreateDefaultService(String.Concat(s_Root, @"\WebDrivers\"), s_Driver_Filename);
-            service.HideCommandPromptWindow = true;
+            try
+            {
+                ChromeDriverService service = ChromeDriverService.CreateDefaultService(string.Concat(s_Root, @"\WebDrivers\"), s_Driver_Filename);
+                //service.HideCommandPromptWindow = true;
 
-            return service;
+                return service;
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+
+            return null;
         }
 
         public ChromeOptions CreateChromeOption()
         {
-            ChromeOptions co_Options = new ChromeOptions();
-            co_Options.AddArgument("--disable-infobars");
-            //co_Options.AddArgument("--auto-open-devtools-for-tabs");
+            try
+            {
+                ChromeOptions co_Options = new ChromeOptions();
+                co_Options.AddArgument("--disable-infobars");
+                //co_Options.AddArgument("--auto-open-devtools-for-tabs");
 
-            return co_Options;
+                return co_Options;
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+
+            return null;
         }
 
         public void CloseBrowser()
@@ -65,14 +85,21 @@ namespace selenium_app.Library
             iwdDriver.Quit();
         }
 
-        public void GoToLink(String url)
+        public void GoToLink(string url)
         {
-            iwdDriver.Navigate().GoToUrl(url);
+            try
+            {
+                iwdDriver.Navigate().GoToUrl(url);
+                WaitingForComplete();
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
         }
 
         public void WaitingForComplete()
         {
-
             try
             {
                 //Waiting for page complete
@@ -95,47 +122,60 @@ namespace selenium_app.Library
             }
             catch (Exception)
             {
-
+                ExceptionHandler();
             }
-
         }
 
-        public Boolean SetInputField(String xpath, String value, Int16 i_Waiting = 0)
+        public bool SetInputField(string xpath, string value, Int16 i_Waiting = 0)
         {
-            if (CheckElementXpath(xpath) == true)
+            try
             {
-                IWebElement iwe_Element = GetElementXpath(xpath);
-                if (iwe_Element != null )
+                if (CheckElementXpath(xpath) == true)
                 {
-                    iwe_Element.Clear();
-                    iwe_Element.SendKeys(value);
-                    if (i_Waiting != 0)
+                    IWebElement iwe_Element = GetElementXpath(xpath);
+                    if (iwe_Element != null)
                     {
-                        Thread.Sleep(i_Waiting);
-                    }
+                        iwe_Element.Clear();
+                        iwe_Element.SendKeys(value);
+                        if (i_Waiting != 0)
+                        {
+                            Thread.Sleep(i_Waiting);
+                        }
 
-                    return true;
+                        return true;
+                    }
                 }
             }
-
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+           
             return false;
         }
 
-        public IWebElement GetControl(String xpath)
+        public IWebElement GetControl(string xpath)
         {
-            if (CheckElementXpath(xpath) == true)
+            try
             {
-                IWebElement iwe_Element = GetElementXpath(xpath);
-                if (iwe_Element != null)
+                if (CheckElementXpath(xpath) == true)
                 {
-                    return iwe_Element;
+                    IWebElement iwe_Element = GetElementXpath(xpath);
+                    if (iwe_Element != null)
+                    {
+                        return iwe_Element;
+                    }
                 }
             }
-
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+            
             return null;
         }
 
-        public Boolean CheckElementXpath(String xpath)
+        public bool CheckElementXpath(string xpath)
         {
             try
             {
@@ -145,18 +185,37 @@ namespace selenium_app.Library
             }
             catch (Exception)
             {
-                return false;
+                ExceptionHandler();
             }
+
+            return false;
         }
 
-        public IWebElement GetElementXpath(String xpath)
+        public IWebElement GetElementXpath(string xpath)
         {
-            WaitingForComplete();
-            IWebElement oReturn = iwdDriver.FindElement(By.XPath(xpath));
+            try
+            {
+                WaitingForComplete();
+                IWebElement oReturn = iwdDriver.FindElement(By.XPath(xpath));
 
-            return oReturn;
+                return oReturn;
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+
+            return null;
         }
 
+        public void ExceptionHandler()
+        {
+            //Set log ...
+            //Capture ...
+
+            //Close
+            CloseBrowser();
+        }
 
 
     }
