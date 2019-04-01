@@ -111,6 +111,35 @@ namespace selenium_app.Library
             return null;
         }
 
+        public IWebElement ClickControl(string xpath)
+        {
+            if (CheckElementXpath(xpath) == true)
+            {
+                IWebElement iwe_Element = GetElementXpath(xpath);
+                if (iwe_Element != null)
+                {
+                    iwe_Element.Click();
+                    return iwe_Element;
+                }
+            }
+
+            return null;
+        }
+
+        public IWebElement SelectCheckbox(string xpath)
+        {
+
+
+            return null;
+        }
+
+        public IWebElement SelectCombobox(string xpath)
+        {
+
+
+            return null;
+        }
+
         public bool CheckElementXpath(string xpath)
         {
             try
