@@ -3,6 +3,7 @@ using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 
 namespace selenium_app.Library
 {
@@ -24,6 +25,9 @@ namespace selenium_app.Library
             option.AddArgument("--disable-infobars");
             option.AddArguments("--start-maximized");
             rwdDriver = new RemoteWebDriver(new Uri(hubUrl), option.ToCapabilities());
+            //rwdDriver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromMinutes(10));
+            //rwdDriver.Manage().Timeouts().ImplicitWait.Add(TimeSpan.FromMinutes(10));
+            //rwdDriver.Manage().Timeouts().AsynchronousJavaScript.Add(TimeSpan.FromMinutes(10));
 
             /*DesiredCapabilities cap = new DesiredCapabilities();
             cap.SetCapability(CapabilityType.BrowserName, DriverSetting.ChromeBrowser);
@@ -44,8 +48,16 @@ namespace selenium_app.Library
 
         public void GoToLink(string url)
         {
-            rwdDriver.Navigate().GoToUrl(url);
-            WaitingForComplete();
+            try
+            {
+                rwdDriver.Navigate().GoToUrl(url);
+                WaitingForComplete();
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+            
         }
 
         public void WaitingForComplete()
@@ -72,26 +84,33 @@ namespace selenium_app.Library
             }
             catch (Exception)
             {
-
+                ExceptionHandler();
             }
         }
 
-        public bool SetInputField(string xpath, string value, int i_Waiting = 0)
+        public bool SetInputField(string xpath, string value, Int16 i_Waiting = 0)
         {
-            if (CheckElementXpath(xpath) == true)
+            try
             {
-                IWebElement iwe_Element = GetElementXpath(xpath);
-                if (iwe_Element != null )
+                if (CheckElementXpath(xpath) == true)
                 {
-                    iwe_Element.Clear();
-                    iwe_Element.SendKeys(value);
-                    if (i_Waiting != 0)
+                    IWebElement iwe_Element = GetElementXpath(xpath);
+                    if (iwe_Element != null)
                     {
-                        Thread.Sleep(i_Waiting);
-                    }
+                        iwe_Element.Clear();
+                        iwe_Element.SendKeys(value);
+                        if (i_Waiting != 0)
+                        {
+                            Thread.Sleep(i_Waiting);
+                        }
 
-                    return true;
+                        return true;
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
             }
 
             return false;
@@ -99,43 +118,21 @@ namespace selenium_app.Library
 
         public IWebElement GetControl(string xpath)
         {
-            if (CheckElementXpath(xpath) == true)
+            try
             {
-                IWebElement iwe_Element = GetElementXpath(xpath);
-                if (iwe_Element != null)
+                if (CheckElementXpath(xpath) == true)
                 {
-                    return iwe_Element;
+                    IWebElement iwe_Element = GetElementXpath(xpath);
+                    if (iwe_Element != null)
+                    {
+                        return iwe_Element;
+                    }
                 }
             }
-
-            return null;
-        }
-
-        public IWebElement ClickControl(string xpath)
-        {
-            if (CheckElementXpath(xpath) == true)
+            catch (Exception)
             {
-                IWebElement iwe_Element = GetElementXpath(xpath);
-                if (iwe_Element != null)
-                {
-                    iwe_Element.Click();
-                    return iwe_Element;
-                }
+                ExceptionHandler();
             }
-
-            return null;
-        }
-
-        public IWebElement SelectCheckbox(string xpath)
-        {
-
-
-            return null;
-        }
-
-        public IWebElement SelectCombobox(string xpath)
-        {
-
 
             return null;
         }
@@ -150,19 +147,91 @@ namespace selenium_app.Library
             }
             catch (Exception)
             {
-                return false;
+                ExceptionHandler();
             }
+
+            return false;
         }
 
         public IWebElement GetElementXpath(string xpath)
         {
-            WaitingForComplete();
-            IWebElement oReturn = rwdDriver.FindElement(By.XPath(xpath));
+            try
+            {
+                WaitingForComplete();
+                IWebElement oReturn = rwdDriver.FindElement(By.XPath(xpath));
 
-            return oReturn;
+                return oReturn;
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+
+            return null;
         }
 
+        public void ExceptionHandler()
+        {
+            //Set log ...
+            //Capture ...
 
+            //Close
+            CloseBrowser();
+        }
+
+        public bool SelectCheckbox(string xpath)
+        {
+
+            try
+            {
+                IWebElement checkbox = GetControl(xpath);
+                if (checkbox.Selected == true)
+                {
+                    checkbox.Click();
+
+                    return true;
+                }
+                
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+
+            return false;
+
+        }
+
+        public bool SelectCombobox(string xpath, string value, string text)
+        {
+
+            try
+            {
+
+                IWebElement combobox = GetControl(xpath);
+                var selectElement = new SelectElement(combobox);
+                if (value != null)
+                {
+                    selectElement.SelectByValue(value);
+
+                    return true;
+                }
+                if (text != null)
+                {
+                    selectElement.SelectByText(text);
+
+                    return true;
+                }
+
+            }
+            catch (Exception)
+            {
+                ExceptionHandler();
+            }
+
+            return false;
+
+        }
 
     }
 }

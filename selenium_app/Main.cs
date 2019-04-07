@@ -37,7 +37,7 @@ namespace selenium_app
             //abc1.GoToLink("https://www.google.com");
 
             Dictionary<string, Thread> dic_thread = new Dictionary<string, Thread>();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
                 dic_thread["thread_" + i] = new Thread(new ThreadStart(abc));
                 dic_thread["thread_" + i].Start();
