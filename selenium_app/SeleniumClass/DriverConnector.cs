@@ -24,9 +24,9 @@ namespace selenium_app.Library
                 ChromeDriverService service = CreateChromeService(s_Driver_Filename);
                 iwdDriver = StartChromeDriver(service, options);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
         }
 
@@ -37,9 +37,9 @@ namespace selenium_app.Library
                 ChromeDriver driver = new ChromeDriver(service, options, TimeSpan.FromSeconds(i_Timeout));
                 return driver;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
 
             return null;
@@ -54,9 +54,9 @@ namespace selenium_app.Library
 
                 return service;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
 
             return null;
@@ -72,9 +72,9 @@ namespace selenium_app.Library
 
                 return co_Options;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
 
             return null;
@@ -92,9 +92,9 @@ namespace selenium_app.Library
                 iwdDriver.Navigate().GoToUrl(url);
                 WaitingForComplete();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
         }
 
@@ -120,9 +120,9 @@ namespace selenium_app.Library
                     Thread.Sleep(100);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
         }
 
@@ -146,9 +146,9 @@ namespace selenium_app.Library
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
            
             return false;
@@ -167,9 +167,9 @@ namespace selenium_app.Library
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
             
             return null;
@@ -183,9 +183,9 @@ namespace selenium_app.Library
                 iwdDriver.FindElement(By.XPath(xpath));
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
 
             return false;
@@ -200,21 +200,22 @@ namespace selenium_app.Library
 
                 return oReturn;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                ExceptionHandler();
+                ExceptionHandler(e);
             }
 
             return null;
         }
 
-        public void ExceptionHandler()
+        public void ExceptionHandler(Exception e)
         {
             //Set log ...
             //Capture ...
 
             //Close
             CloseBrowser();
+            throw e;
         }
 
 
